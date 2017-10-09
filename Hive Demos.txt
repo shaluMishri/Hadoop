@@ -1,0 +1,282 @@
+create database Novdb;
+
+describe database Novdb;
+
+use Novdb;
+
+show databases;
+-----------------------------------------------------------------
+
+Internal/Managed Table
+
+CREATE TABLE IF NOT EXISTS Cert_tbl2(CID INT, CName STRING, JL INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+LOAD DATA INPATH '/userhdfs/Certifications.txt' OVERWRITE INTO TABLE Cert_tbl2;
+
+
+Select * from Cert_tbl;
+
+Select * from Cert_tbl limit 5;
+
+Select * from Cert_tbl where CID =115;
+
+Select CID, CName from Cert_tbl ;
+
+Select CID, CName from Cert_tbl where CID =110;
+
+select * from Cert_tbl where cname like '<regular expression> '
+
+Select col(s) from table where <cond1> (logical/relation) <cond2>
+
+show tables;
+
+drop table Cert_tbl;
+
+Select * from Cert_tbl;
+
+Show databases;
+
+show databases LIKE 's.*';
+
+
+To store query result in hdfs:
+INSERT OVERWRITE DIRECTORY '/userhdfs/dir1' Select * from Cert_tbl where CID =110;
+
+drop database if exists employee;
+
+drop database IF EXISTS employee CASCADE;
+
+===========================================================================================
+External Table:-
+
+CREATE EXTERNAL TABLE IF NOT EXISTS Cert_tblex(CID INT, CName STRING, JL INT) ROW FORMAT 
+DELIMITED FIELDS TERMINATED BY '\t';
+
+LOAD DATA INPATH '/userhdfs/Certifications.txt' OVERWRITE INTO TABLE Cert_tblex;
+
+describe formatted Cert_tblex;
+
+
+========================================================================================
+ALTER commands:
+
+ADD COLUMNS (new_col INT);
+
+ALTER TABLE name RENAME TO new_name
+ALTER TABLE name ADD COLUMNS (col_spec[, col_spec ...])
+ALTER TABLE name DROP [COLUMN] column_name
+ALTER TABLE name CHANGE column_name new_name new_type
+ALTER TABLE name REPLACE COLUMNS (col_spec[, col_spec ...])
+
+========================================================================================
+
+Aggregation funtion.
+=========
+count(*)
+sum(col)
+avg(col)
+min(col)
+max(col)
+------------------------------------------------------------------------------------
+
+Joins:
+====
+
+
+Sales.txt:
+=======
+1,123
+2,112
+3,121
+4,122
+5,132
+
+Customer.txt:
+==========
+123,Jack
+112,Smith
+121,John
+132,Shelly
+-------------------------------------------------------------------------------------------------
+Create table if not exists Sales (Sales_id int,customer_id int)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH '/userhdfs/Sales.txt' INTO TABLE Sales;
+
+Create table if not exists customer (customer_id int,customer_name String)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH '/userhdfs/customer.txt' INTO TABLE customer;
+
+
+Inner Join:
+========
+  
+Select s.Sales_id,c.customer_name from Sales s
+JOIN
+customer c
+ON (s.customer_id = c.customer_id);
+
+Outer Joins:
+========
+Select s.Sales_id,c.customer_name from Sales s
+RIGHT OUTER JOIN
+customer c
+ON (s.customer_id = c.customer_id);
+
+ 
+Select s.Sales_id,c.customer_name from Sales s
+LEFT OUTER JOIN
+customer c
+ON (s.customer_id = c.customer_id);
+
+
+Select s.Sales_id,c.customer_name from Sales s
+FULL OUTER JOIN
+customer c
+ON (s.customer_id = c.customer_id);
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Alternative LOAD command:-
+
+CREATE TABLE IF NOT EXISTS Cert_tbl(CID INT, CName STRING, JL INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+#LOAD DATA INPATH '/userhdfs/Cert_tblifications.txt' OVERWRITE  INTO TABLE Cert_tbl;
+
+
+CREATE TABLE IF NOT EXISTS Cert_tbl1(CID INT, CName STRING, JL INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+
+INSERT OVERWRITE TABLE Cert_tbl1
+select Empno, EmpName,Salary,Address,countryCode,ContactNumbers,BaseLocation,DateOfJoining from Cert_tbl;
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Collection Types:-
+
+array
+struct
+map(k,v)
+
+
+
+CREATE TABLE fin_employee(EmpNo INT, 
+EmpName STRING, 
+Salary MAP<String, FLOAT>, 
+Address STRUCT<street:STRING, city:STRING,state:STRING, zip:INT, countryCode:STRING>, 
+ContactNumbers ARRAY<STRING>, 
+JobLevel INT,
+BaseLocation STRING, 
+DateOfJoining STRING) 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+COLLECTION ITEMS TERMINATED BY ',' 
+MAP KEYS TERMINATED BY ':' 
+LINES TERMINATED BY '\n';
+
+
+LOAD DATA INPATH '/userhdfs/Employee.txt' INTO TABLE fin_employee;
+
+select * from fin_employee limit 5;
+
+Select ContactNumbers[1] from fin_employee where EmpNo =1243;
+
+select salary["boa"] from fin_employee where EmpNo=1243;
+
+select EmpName,Address.street from fin_employee where EmpNo=1243;
+
+Partition:-
+
+Static Partition:-
+
+CREATE TABLE part_employee 
+(EmpNo INT, 
+EmpName STRING, 
+Salary MAP< String, FLOAT>, 
+Address STRUCT<street:STRING, city:STRING,state:STRING, zip:INT, countryCode:STRING>, 
+ContactNumbers ARRAY<STRING>, 
+BaseLocation STRING, 
+DateOfJoining STRING) 
+PARTITIONED BY (JobLevel INT) 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+COLLECTION ITEMS TERMINATED BY ',' 
+MAP KEYS TERMINATED BY ':' 
+LINES TERMINATED BY '\n';
+
+
+LOAD DATA INPATH '/a1di1HDFS/EmployeeJL1.txt' INTO TABLE part_employee PARTITION (JobLevel ='1');
+
+LOAD DATA INPATH '/userhdfs/EmployeeJL2.txt' INTO TABLE part_employee PARTITION (JobLevel = '2');
+
+
+Select * from userhdfs where JobLevel = 2 ;
+
+
+Dynamic Partition:-
+
+SET hive.exec.dynamic.partition = true;
+SET hive.exec.dynamic.partition.mode = nonstrict;
+
+CREATE TABLE dynam_employee 
+(EmpNo INT, 
+EmpName STRING, 
+Salary MAP< String, FLOAT>, 
+Address STRUCT<street:STRING, city:STRING,state:STRING, zip:INT, countryCode:STRING>, 
+ContactNumbers ARRAY<STRING>, 
+BaseLocation STRING, 
+DateOfJoining STRING) 
+PARTITIONED BY (JobLevel INT) 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+COLLECTION ITEMS TERMINATED BY ',' 
+MAP KEYS TERMINATED BY ':' 
+LINES TERMINATED BY '\n';
+
+
+INSERT OVERWRITE TABLE dynam_employee
+PARTITION (JobLevel)
+select Empno, EmpName,Salary,Address,countryCode,ContactNumbers,BaseLocation,DateOfJoining JobLevelfrom employee;
+
+
+
+================================================================================================================
+
+Bucket:-
+set hive.enforce.bucketing=true;   
+
+CREATE TABLE IF NOT EXISTS sampleassessment( EmpNo INT, CertificationID INT, DateofAssessment STRING, Score INT, Grade STRING, Attempt INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'; 
+
+LOAD DATA INPATH '/userhdfs/Assessment.txt' INTO TABLE sampleassessment;
+
+Bucket Table
+
+CREATE TABLE bucket_assessment(EmpNo INT, CertificationID INT, DateofAssessment STRING, Score INT, Grade STRING, Attempt INT) CLUSTERED BY (Score ) INTO 4 BUCKETS;
+
+INSERT OVERWRITE TABLE buckassessment SELECT * FROM Assessment;
+
+Select * from bucketssessment where score= 100;
+
+====================================================================================================
+hive> set hive.cli.print.header=true;
+
+INDEX:
+******
+
+CREATE TABLE IF NOT EXISTS employee(empno int,empname string);
+
+CREATE INDEX emp_index 
+ON TABLE employee(empno) 
+AS 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler'
+WITH DEFERRED REBUILD;
+
+ 
+To build the index :
+=========================================
+ALTER INDEX emp_index 
+ON employee
+REBUILD;
+
+SHOW FORMATTED INDEX ON employee;
+
+DROP INDEX IF EXISTS emp_index ON TABLE employee;
