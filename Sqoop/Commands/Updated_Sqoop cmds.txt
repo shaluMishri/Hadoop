@@ -1,0 +1,128 @@
+Sqoop commands
+===============
+
+Note:
+============================================================================
+-m argument is to specify number of mappers.
+--target-dir to specifies the target-dir
+--warehouse-dir to specifies the target-dir while importing multiple tables
+============================================================================
+
+**List databases:
+sqoop list-databases --connect jdbc:mysql://10.7.218.186/ 
+
+**List Tables:
+sqoop list-tables --connect jdbc:mysql://10.7.218.186/test 
+
+**Importing a table into HDFS:
+
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--table test_dummy \
+--target-dir /user/user123hdfs/prdx1/ 
+
+**Setting to mapper 1
+
+sqoop import \
+ --connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--table test_dummy \
+-m 1 \
+--target-dir /user/user123hdfs/prdx2
+
+**Export data from HDFS to RDBMS(Mysql):
+(The table structure should be present in the RDBMS before we execute export)
+
+sqoop export \
+ --connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--table pr2 \
+--export-dir /user/user123hdfs/prdx2
+
+
+<< Assuming database = products, table = product>>
+
+**Importing all tables from the given database and exclude few tables
+
+sqoop import-all-tables \
+--connect jdbc:mysql://10.7.218.186/products \ --username hadooptraining --password hadooptraining
+-m 1 \
+--warehouse-dir /user/user123hdfs/
+--exclude-tables accounts,emp
+
+** Importing filtered records
+sqoop import \
+ --connect jdbc:mysql://10.7.218.186/products \ --username hadooptraining --password hadooptraining
+--table product
+--where "productID > 1010" \
+-m 1 \
+--target-dir /user/user123hdfs/prdx3
+
+
+**Import with a free form query without where clause:
+sqoop import \
+ --connect jdbc:mysql://10.7.218.186/products \ --username hadooptraining --password hadooptraining
+--query 'select productID,productCode from product where $CONDITIONS' \
+-m 1 \
+--target-dir /user/user123hdfs/prdx4
+
+**Import with a free form query with where clause:
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/products \ --username hadooptraining --password hadooptraining
+--query 'select productID,productCode,name,quantity,price from products where productID < 1010 AND $CONDITIONS' \
+-m 1 \
+--target-dir /user/user123hdfs/prdx5
+
+**Incremental Import
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/products \ --username hadooptraining --password hadooptraining
+--table test_dummy \
+--incremental append \
+--check-column productid \
+--last-value 1010 \
+--target-dir /user/user123hdfs/prdx6
+
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/products \ --username hadooptraining --password hadooptraining
+--table products \
+--incremental lastmodified \
+--check-column last_update_date \
+--last-value "2016-11-02 01:01:01"
+--target-dir /user/user123hdfs/prdx7
+ 
+** compress the table 
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--table test_dummy \
+-m 1 \
+--compress \
+--target-dir /user/user123hdfs/prdx8
+
+OR
+
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--table test_dummy \
+-m 1 \
+-z \
+--target-dir /user/user123hdfs/prdx9
+
+
+Direct and quick queries or inserts and updates with sqoop eval:
+================================================
+Query:
+=====
+sqoop eval --connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--query "select * from test_dummy"
+
+
+Insert:
+====
+sqoop eval --connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+-e "insert into test_dummy values(101)
+
+
+direct method
+sqoop import \
+--connect jdbc:mysql://10.7.218.186/test \ --username hadooptraining --password hadooptraining
+--table test_dummy
+--direct
+--target-dir /user/user123hdfs/prdx10
