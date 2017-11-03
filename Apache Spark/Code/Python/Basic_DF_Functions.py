@@ -19,13 +19,13 @@ df = sqlContext.createDataFrame([{"name":"Michael"},{"name":"Andy", "age":30},{"
 >>> df2 = sqlContext.createDataFrame([{"name":"Andy"},{"name":"Pinku","height":"50"},{"name":"Michael","height":"55"}])
 #agg(*exprs) : Aggregate on the entire DataFrame without groups (shorthand for df.groupBy.agg())
 >>> df.agg({"age": "max"}).collect()
-+-------+----+
-|   name| age|
-+-------+----+
-|Michael|null|
-|   Andy|  30|
-| Justin|  19|
-+-------+----+
+#+-------+----+
+#|   name| age|
+#+-------+----+
+#|Michael|null|
+#|   Andy|  30|
+#| Justin|  19|
+#+-------+----+
 
 
 #alias(alias) : Returns a new DataFrame with an alias set.
