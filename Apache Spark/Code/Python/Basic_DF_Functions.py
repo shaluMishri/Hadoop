@@ -1,4 +1,5 @@
-#Simple Examples of Functions on DataFrame in Apache Spark using python.Some of the options are missing due to version issue.
+#Simple Examples of Transformation on DataFrame in Apache Spark using python.Some of the options are missing due to version
+#
 
 
 #from pyspark.conf import SparkConf
@@ -12,7 +13,7 @@ sc = SparkContext()
 sqlContext = SQLContext(sc)
 
 #Creating dataframe .You can use more options or create manually.
-#df = sqlContext.read.json("file//././people.json")
+#df = sqlContext.read.json("examples/src/main/resources/people.json")
 
 df = sqlContext.createDataFrame([{"name":"Michael"},{"name":"Andy", "age":30},{"name":"Justin", "age":19}])
 >>> df2 = sqlContext.createDataFrame([{"name":"Andy"},{"name":"Pinku","height":"50"},{"name":"Michael","height":"55"}])
@@ -30,13 +31,13 @@ df = sqlContext.createDataFrame([{"name":"Michael"},{"name":"Andy", "age":30},{"
 #alias(alias) : Returns a new DataFrame with an alias set.
 >>> df_al1 = df.alias("df_al1")
 >>> df_al1.show()
-+-------+----+
-|   name| age|
-+-------+----+
-|Michael|null|
-|   Andy|  30|
-| Justin|  19|
-+-------+----+
+#+-------+----+
+#|   name| age|
+#+-------+----+
+#|Michael|null|
+#|   Andy|  30|
+#| Justin|  19|
+#+-------+----+
 
 #coalesce(numPartitions) : Returns a new DataFrame that has exactly numPartitions partitions.
 >>> df.coalesce(1).rdd.getNumPartitions()
@@ -61,15 +62,15 @@ df = sqlContext.createDataFrame([{"name":"Michael"},{"name":"Andy", "age":30},{"
 
 #describe(*cols) : Computes statistics for numeric and string columns.
 >>> df.describe(['age']).show()
-+-------+------------------+
-|summary|               age|
-+-------+------------------+
-|  count|                 2|
-|   mean|              24.5|
-| stddev|7.7781745930520225|
-|    min|                19|
-|    max|                30|
-+-------+------------------+
+#+-------+------------------+
+#|summary|               age|
+#+-------+------------------+
+#|  count|                 2|
+#|   mean|              24.5|
+#| stddev|7.7781745930520225|
+#|    min|                19|
+#|    max|                30|
+#+-------+------------------+
 
 #distinct() : Returns a new DataFrame containing the distinct rows in this DataFrame.
 >>> df.distinct().count()
@@ -106,13 +107,13 @@ Scan ExistingRDD[name#0,age#1L]
 
 #fillna(value, subset=None) : Replace null values, alias for na.fill(). DataFrame.fillna() and DataFrameNaFunctions.fill() are aliases of each other.
 >>> df.na.fill(50).show()
-+-------+---+
-|   name|age|
-+-------+---+
-|Michael| 50|
-|   Andy| 30|
-| Justin| 19|
-+-------+---+
+#+-------+---+
+#|   name|age|
+#+-------+---+
+#|Michael| 50|
+#|   Andy| 30|
+#| Justin| 19|
+#+-------+---+
 
 #filter(condition) : Filters rows using the given condition.
 >>> df.filter("age > 10").collect()
@@ -150,13 +151,13 @@ root
  
 #replace(to_replace, value, subset=None) : Returns a new DataFrame replacing a value with another value. DataFrame.replace() and DataFrameNaFunctions.replace() are aliases of each other.
 >>> df.na.replace(19, 20).show()
-+-------+----+
-|   name| age|
-+-------+----+
-|Michael|null|
-|   Andy|  30|
-| Justin|  20|
-+-------+----+
+#+-------+----+
+#|   name| age|
+#+-------+----+
+#|Michael|null|
+#|   Andy|  30|
+#| Justin|  20|
+#+-------+----+
 	
 #schema : Returns the schema of this DataFrame as a pyspark.sql.types.StructType.
 >>> df.schema
@@ -168,13 +169,13 @@ StructType(List(StructField(name,StringType,true),StructField(age,LongType,true)
 
 #show(n=20, truncate=True) : Prints the first n rows to the console.
 >>> df2.show()
-+-------+------+
-|   name|height|
-+-------+------+
-|   Andy|  null|
-|  Pinku|    50|
-|Michael|    55|
-+-------+------+
+#+-------+------+
+#|   name|height|
+#+-------+------+
+#|   Andy|  null|
+#|  Pinku|    50|
+#|Michael|    55|
+#+-------+------+
 
 #sort(*cols, **kwargs) : Returns a new DataFrame sorted by the specified column(s).
 >>> df.sort(df.age.desc()).collect()
@@ -182,23 +183,23 @@ StructType(List(StructField(name,StringType,true),StructField(age,LongType,true)
 
 #sortWithinPartitions(*cols, **kwargs) : Returns a new DataFrame with each partition sorted by the specified column(s).
 >>> df.sortWithinPartitions("age", ascending=False).show()
-+-------+----+
-|   name| age|
-+-------+----+
-|Michael|null|
-|   Andy|  30|
-| Justin|  19|
-+-------+----+
+#+-------+----+
+#|   name| age|
+#+-------+----+
+#|Michael|null|
+#|   Andy|  30|
+#| Justin|  19|
+#+-------+----+
 
 #subtract(other) : Return a new DataFrame containing rows in this frame but not in another frame.
 >>> df.subtract(df2).show()
-+-------+----+
-|   name| age|
-+-------+----+
-|   Andy|  30|
-| Justin|  19|
-|Michael|null|
-+-------+----+
+#+-------+----+
+#|   name| age|
+#+-------+----+
+#|   Andy|  30|
+#| Justin|  19|
+#|Michael|null|
+#+-------+----+
 
 #take(num) : Returns the first num rows as a list of Row.
 >>> df.take(1)
