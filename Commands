@@ -1,0 +1,112 @@
+
+Load/Transform/Dump:- 
+movierecord = LOAD '/pighdfs/movies_sfile.csv' USING PigStorage(',') as (id:int,name:chararray,year:int,rating:double,duration:int);
+movie_by_year1 = FILTER movierecord by year > 2015 and year < 2013;
+movie_nameyear = FOREACH movie_by_year1 GENERATE name,year;
+store movie_nameyear into '/pighdfs/res_movie';
+mv5 = LIMIT movierecord 5;
+dump mv5;
+Joining two operators:
+grunt> A = LOAD '/pighdfs/student.tsv' as (id:int,name:chararray,year:int,rating:double,duration:int);grunt> B = FOREACH (Filter A by year > 2015 and year < 2013) GENERATE name,year;
+~= in SQL
+Select name,year from A where year > 2015 and year < 2013;
+=========================================================================================================================================Filter:- Filtering Rows= Select * from table where <Cond'n>=============================================movie_by_year1 = FILTER movierecord by year > 1978 and year < 1991;
+==========================================For each- Selective columns
+=Select col1,col2 from table.
+==========================================movie_nameyear = FOREACH movie_by_year1 GENERATE name,year;
+store movie_nameyear into '/pighdfs/res_movie11';
+==============================================
+Complete Data Flow:-movierecord = LOAD '/pighdfs/movies_sfile.csv' USING PigStorage(',') as (id:int,name:chararray,year:int,rating:double,duration:int);movie_by_year1 = FILTER movierecord by year > 1978 and year < 1991;movie_nameyear = FOREACH movie_by_year1 GENERATE name,year;store movie_nameyear into '/pighdfs/res_movie2';
+Pig Script:-
+Batch Mode:-
+create a file:MovieData.pig
+write the below scripts in the file:
+movierecord1 = LOAD '/pighdfs/movies_sfile.csv' USING PigStorage(',') as (id:int,name:chararray,year:int,rating:double,duration:int);movie_by_year2 = FILTER movierecord1 by year > 2015 and year < 2013;movie_nameyear = FOREACH movie_by_year2 GENERATE name,year;store movie_nameyear into '/pighdfs/res_movie3';
+save the file 
+Execute as below:
+$pig MovieData.pigORgrunt>run/exec MovieData.pig----------------------------------------------------------------------
+Few more on FOR EACH
+For each- Selective columns
+=Select col1,col2 from table.
+movie_name = FOREACH movie_by_year1 GENERATE name;
+movieall = FOREACH movie_by_year1 GENERATE *;
+movie_name_id = FOREACH movie_by_year1 GENERATE name, id;
+mid_name2 = FOREACH movie_by_year1 GENERATE $0,$1;
+mid_name3 = FOREACH movie_by_year1 GENERATE $0..$3;
+mid_name4 = FOREACH movie_by_year1 GENERATE $2..
+mid_name5 = FOREACH movie_by_year1 GENERATE ..$3;
+empdata = FOREACH employee GENERATE sal+comm;
+describe movierecord;
+movierecord1 = LOAD '/PigDemo/movies_sfile.csv' USING PigStorage(',') as (id,name,year,rating,duration);
+ILLUSTRATE movie_by_year1;
+========================LOAD( No MapReduce)
+MRProcess(Operators)Store/Dump===================================
+
+LIMIT:------------------------------------
+mv12 = LIMIT movierecord 4;
+dump mv12;----------------------------------------Top-4 or random any 4 record?
+Top-4
+ORDER BY( ASC is default)-----------
+List all the movies in the ascending  order of year.asc_movies_by_year = ORDER movierecord BY year ;
+List all the movies in the ascending descending order of year.desc_movies_by_year = ORDER movierecord  BY year DESC;
+Unique Data:------------uniq = distinct desc_movies_by_year;dump uniq;-----------------------------------------------------------
+Aggregate  functios:-mavg = for each employee generate avg(sal);
+mmax = for each employee generate max(sal);
+mmin = for each employee generate min(sal);
+================================================================================
+Group:- GROUP:-List the  movies released each year.
+movierecord = LOAD '/pighdfs/movies_sfile.csv' USING PigStorage(',') as (id:int,name:chararray,year:int,rating:double,duration:int);
+groupbyyear = group movierecord  by year;
+store groupbyyear into '/PigDemo/Grprc1/';
+O/P:1915 {(13,The Birth of a Nation,1915,2.9,12118)}1919 {(11,Broken Blossoms,1919,3.3,5367)}1921 {(3,Orphans of the Storm,1921,3.2,9062)}1929 {(9,Nosferatu: Original Version,1929,3.5,5651)}1932 {(2,The Mummy,1932,3.5,4388)}1935 {(17,The Bride of Frankenstein,1935,3.7,4485)}1963 {(5,Night Tide,1963,2.8,5126)}1971 {(15,Big Doll House,1971,2.9,5696),(20,The Beguiled,1971,3.4,6307)}1978 {(14,The Boys from Brazil,1978,3.6,7417)}1981 {(19,Bustin' Loose,1981,3.7,5598)}1985 {(16,The Breakfast Club,1985,4.0,5823),(6,One Magic Christmas,1985,3.8,5333)}1991 {(4,The Object of Beauty,1991,2.8,6150)}1993 {(1,The Nightmare Before Christmas,1993,3.9,4568)}1994 {(7,Muriel's Wedding,1994,3.5,6323),(8,Mother's Boys,1994,3.4,5733)}1995 {(10,Nick of Time,1995,3.4,5333)}1996 {(12,Big Night,1996,3.6,6561),(18,Beautiful Girls,1996,3.5,6755)}
+Parallel:
+--parallel.pig
+movierecord = LOAD '/pighdfs/movies_sfile.csv' USING PigStorage(',') as (id:int,name:chararray,year:int,rating:double,duration:int);
+groupbyyear = group movierecord  by year parallel 5;;
+store groupbyyear into '/PigDemo/Grprc2/';
+
+Without Schema.(Pblm statement Word count)Pig relation without Schema-- TOKENIZE splits the line into a field for each word.-- flatten - (unnest)- will take the collection of records returned by 
+Personality.txt----------------------------Hello User How are youI am fine How are you doingHow is BigdataBigdata is interesting
+-----------------------------------------------lines = LOAD '/pighdfs/Personality.txt' USING PigStorage(',') AS (line:chararray);words = FOREACH lines GENERATE FLATTEN(TOKENIZE(line)) as word;grouped = GROUP words BY word;wordcount = FOREACH grouped GENERATE group, COUNT(words);STORE wordcount into '/pighdfs/finalrec4/';
+lines = LOAD '/pighdfs/Personality.txt' USING PigStorage(',') AS (line:chararray);STORE lines into '/pighdfs/finalrec1/';words = FOREACH lines GENERATE FLATTEN(TOKENIZE(line)) as word;STORE words into '/pighdfs/finalrec2/';grouped = GROUP words BY word;STORE grouped into '/pighdfs/finalrec3/';wordcount = FOREACH grouped GENERATE group, COUNT(words);STORE wordcount into '/pighdfs/finalrec4/';
+
+Join:-
+daily = LOAD 'NYSE_daily' USING PIGSTORAGE('\t') AS (exchange:chararray , symbol:chararray , date:chararray , open:int, high:int,low:int,close:int,volume:int , adj_close:int);
+divs = load 'NYSE_dividends' as (exchange:chararray, symbol:chararray,date:chararray, dividends);
+jnd = join daily by symbol, divs by symbol;
+---------------------------------------------------------------------
+jnd1 = join daily by (symbol, date), divs by (symbol, date);
+jnd = join daily by (symbol, date) left outer divs by (symbol, date);
+jnd = join daily by (symbol, date) right outer divs by (symbol, date);
+---------------------------------------------------------------------------------------------selfjoin.pig
+employee
+divs1 = load 'NYSE_dividends' as (exchange:chararray, symbol:chararray,date:chararray, dividends);
+divs2 = load 'NYSE_dividends' as (exchange:chararray, symbol:chararray,date:chararray, dividends);
+jnd = join divs1 by symbol, divs2 by symbol;
+
+Complex Type:-
+Tuple():
+Tuple 
+(3)(John)(John,30,FIN)
+----------------------------------------------data.txt
+(3,8,9)(1,4,7)(2,5,8)A = LOAD 'data.txt' AS (T: tuple (f1:int, f2:int, f3:int));
+OR
+A = LOAD 'data.txt' AS (T: (f1:int, f2:int, f3:int));
+DESCRIBE A;A: {T: (f1: int,f2: int,f3: int)}
+DUMP A;((3,8,9))((1,4,7))((2,5,8))
+-----------------------------------------------------------------------------cat data.txt;(3,8,9) (mary,19)(1,4,7) (john,18)(2,5,8) (joe,18)
+A = LOAD data.txt AS (F:tuple(f1:int,f2:int,f3:int),T:tuple(t1:chararray,t2:int));
+DESCRIBE A;A: {F: (f1: int,f2: int,f3: int),T: (t1: chararray,t2: int)}
+DUMP A;((3,8,9),(mary,19))((1,4,7),(john,18))((2,5,8),(joe,18))
+--------------------------------------------------
+Bag{}:cat data;{(3,8,9)}{(1,4,7)}{(2,5,8)}
+A = LOAD 'data' AS (B: bag {T: tuple(t1:int, t2:int, t3:int)});A = LOAD 'data' AS (B: {T: (t1:int, t2:int, t3:int)});
+DESCRIBE A:A: {B: {T: (t1: int,t2: int,t3: int)}}-------------------------------------------Map:cat data.txt;[open#apache][bigdata#hadoop]
+A = LOAD 'data.txt' AS (M:map []);A = LOAD 'data' AS (M:[]);
+DESCRIBE A;a: {M: map[ ]}
+DUMP A;([open#apache])([apache#hadoop])
+Data Set:-
+Jorge Posada New York Yankees {(Catcher),(Designated_hitter)} [games#1594,hit_by_pitch#65,on_base_percentage#0.379,grand_slams#7,home_runs#243,at_bats#5365,sacrifice_flies#43,gdb#163,sacrifice_hits#1,ibbs#71,base_on_balls#838,hits#1488,rbis#964,slugging_percentage#0.48,batting_average#0.277,triples#9,doubles#342,strikeouts#1278,runs#817]
+sportsdata = load '/pighdfs/baseball' as (name:chararray, team:chararray,position:bag{t:(p1:chararray)}, bat:map[]);
+batavgdata = foreach sportsdata generate bat#'batting_average';
+STORE batavgdata into '/pigdemo/stat_res/'
