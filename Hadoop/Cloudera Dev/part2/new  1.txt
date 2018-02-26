@@ -1,0 +1,8 @@
+make = (lambda x, y, z: lower_udf(df[z]),replace_udf(df[z],"\n",""),replace_udf(df[z],"\r","") if (x != 'float') else replace_udf(df[z],xs,"else") , StringType())
+ for x in rdd.take(4):
+  for k in x:
+    df.select(F.when(if (x!= 'float'), lower_udf(df['one']),replace_udf(df['one'],"\n",""),replace_udf(df['one'],"\r","")).otherwise(replace_udf(df['one'],xs,"else")))
+	dfs.show()
+	
+	dfs = df.select(F.when((if (col_type!= 'float')), (lower_udf(df[colname]),replace_udf(df[colname],"\n",""),replace_udf(df[colname],"\r",""))).otherwise(replace_udf(df[colname],k,"else")))
+      

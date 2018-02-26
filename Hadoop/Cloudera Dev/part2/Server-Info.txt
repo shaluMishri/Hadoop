@@ -1,0 +1,10 @@
+Primary Groups:
+eircfspo eirdsmpo 
+
+Servers: 
+Abnitio : devabinitio1, devabinitio2, devabinitio3, qaabinitio1, qaabinitio2, qaabinitio3,
+DEV: d2bda1node01, d2bda1node02, d2bda1node03, d2bda1node04,  d2bda1node05, d2bda1node06, d2bda1node07, d2bda1node08, d2bda1node09, d2bda1node10, d2bda1node11, d2bda1node12,
+QA Nodes : qbda1node01, qbda1node02, qbda1node03, qbda1node04, qbda1node05, qbda1node06
+
+Hue Browser QA:	http://qbda1node04.suntrust.com:8888/home
+Beeline URL:	!connect jdbc:hive2://qbda1node04:10000/default;principal=hive/qbda1node04.suntrust.com@CORP.SUNTRUST.COM
