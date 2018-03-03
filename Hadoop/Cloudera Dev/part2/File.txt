@@ -1,7 +1,0 @@
-fpo_ft_sei_net_asset_flow_acct_parq  932777
-fpo_dt_acct_parq 2639204
-fpo_ft_relat_mth_parq 3761728
-fpo_ft_relat_mth_parq143 parq 3723679
-fpo_dt_acct_parq143 2440867
-2639204
-temp_fpo_bihierflat_new 710881
